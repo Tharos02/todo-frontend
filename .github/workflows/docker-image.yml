@@ -1,0 +1,64 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Erstelle environment.ts und environment.development.ts basierend auf Umgebungsvariablen
+      - name: Create environment files
+        run: |
+          # Erstelle die Datei für die Produktion (environment.ts)
+          echo "export const environment = {" > src/environments/environment.ts
+          echo "  production: true," >> src/environments/environment.ts
+          echo "  apiUrl: '${{ secrets.PROD_API_URL }}'" >> src/environments/environment.ts
+          echo "};" >> src/environments/environment.ts
+
+          # Erstelle die Datei für die Entwicklung (environment.development.ts)
+          echo "export const environment = {" > src/environments/environment.development.ts
+          echo "  production: false," >> src/environments/environment.development.ts
+          echo "  apiUrl: '${{ secrets.DEV_API_URL }}'" >> src/environments/environment.development.ts
+          echo "};" >> src/environments/environment.development.ts
+
+      # Baue das Docker-Image
+      - name: Build Docker image for Angular app
+        run: |
+          docker build --build-arg BUILD_FOR_SYSTEM=prod --platform=linux/amd64 -t todo-frontend:prod .
+
+      # Logge dich bei Docker Hub ein
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Pushe das Docker-Image
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker tag todo-frontend:prod ${{ secrets.DOCKER_USERNAME }}/todo-frontend:prod
+          docker push ${{ secrets.DOCKER_USERNAME }}/todo-frontend:prod
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Install Render CLI
+        run: |
+          curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
+          unzip render.zip
+          sudo mv cli_v1.1.0 /usr/local/bin/render
+
+      - name: Trigger deploy with Render CLI
+        run: |
+          export RENDER_API_KEY=${{ secrets.RENDER_API_TOKEN }}
+          render workspace set ${{ secrets.WORKSPACE_ID }} --output json -o json
+          render deploys create ${{ secrets.SERVICE_ID }} --image docker.io/${{ secrets.DOCKER_USERNAME }}/todo-frontend:prod --wait --confirm --output json -o json
