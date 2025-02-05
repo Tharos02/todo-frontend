@@ -16,6 +16,7 @@ jobs:
       # Erstelle environment.ts und environment.development.ts basierend auf Umgebungsvariablen
       - name: Create environment files
         run: |
+          mkdir -p src/environments
           # Erstelle die Datei für die Produktion (environment.ts)
           echo "export const environment = {" > src/environments/environment.ts
           echo "  production: true," >> src/environments/environment.ts
