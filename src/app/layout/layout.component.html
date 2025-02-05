@@ -1,0 +1,7 @@
+<p-menubar [model]="items" class="flex justify-center items-center w-full mt-2">
+  <ng-template #end>
+    <p-avatar icon="pi pi-user" shape="circle" class="cursor-pointer" (click)="userMenu.toggle($event)"/>
+    <p-menu #userMenu [model]="userMenuItems" popup></p-menu>
+  </ng-template>
+</p-menubar>
+<router-outlet></router-outlet>

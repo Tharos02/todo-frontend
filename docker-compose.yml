@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  frontend:
+    container_name: todo-frontend-dev
+    build:
+      context: .
+      args:
+        BUILD_FOR_SYSTEM: dev
+    ports:
+      - 80:80
+    restart: always
