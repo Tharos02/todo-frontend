@@ -4,14 +4,15 @@ import {Observable, tap} from 'rxjs';
 import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
 import {Injectable} from '@angular/core';
+import {Priority} from './enums/priority.enum';
 
 export interface Task {
-  id: number,
+  id?: number,
   title: string,
   description: string,
-  priority: string,
+  priority: Priority,
   status: string,
-  userId: number,
+  userId?: number,
 }
 
 @Injectable({
@@ -42,5 +43,11 @@ export class TaskService {
     return this.http.patch<Task>(`${this.taskUrl}/update/${task.id}`, task, {
       withCredentials: true
     });
+  }
+
+  createTask(task: Task): Observable<Task> {
+    return this.http.post<Task>(`${this.taskUrl}/create`, task, {
+      withCredentials: true
+    })
   }
 }

@@ -41,9 +41,9 @@ import {Status} from '../enums/status.enum';
 })
 
 export class BoardComponent implements OnInit {
-  todo: object[] = [];
-  inProgress: object[] = [];
-  done: object[] = [];
+  todo: Task[] = [];
+  inProgress: Task[] = [];
+  done: Task[] = [];
   visible: boolean = false;
   priorityOptions: Object[] = [
     {name: 'Low', value: Priority.LOW},
@@ -53,7 +53,7 @@ export class BoardComponent implements OnInit {
   newTask = {
     title: '',
     description: '',
-    selectedPriority: Priority.LOW,
+    priority: Priority.LOW,
     status: 'TODO'
   };
 
@@ -67,11 +67,13 @@ export class BoardComponent implements OnInit {
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
 
-      console.log(event);
+      this.sortTasks();
+
       let task: any = {
         id: event.item.data.id,
         title: event.item.data.title,
         priority: event.item.data.priority,
+        description: event.item.data.description,
         status: null
       }
 
@@ -102,18 +104,22 @@ export class BoardComponent implements OnInit {
   loadTasks() {
     this.taskService.getUserTasks().subscribe({
       next: (response) => {
-        this.todo = response.filter(todo => todo.status === Status.TODO || todo.status === null);
-        this.inProgress = response.filter(todo => todo.status === Status.IN_PROGRESS);
-        this.done = response.filter(todo => todo.status === Status.DONE);
+
+        this.todo = response.filter(task => task.status === Status.TODO || task.status === null);
+        this.inProgress = response.filter(task => task.status === Status.IN_PROGRESS);
+        this.done = response.filter(task => task.status === Status.DONE);
+
+        this.sortTasks();
+
       },
       error: (error) => {
         console.error(error);
       }
-    })
+    });
   }
 
+
   updateTask(task: Task) {
-    console.log(task);
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
         console.log(response);
@@ -124,8 +130,28 @@ export class BoardComponent implements OnInit {
   }
 
   saveTask(): void {
-    console.log(this.newTask);
+    this.taskService.createTask(this.newTask).subscribe({
+      next: () => {
+        this.loadTasks();
+        this.visible = false;
+      }, error: (error) => {
+        console.error(error);
+      }
+    })
   }
+
+  sortTasks() {
+    const priorityOrder: Record<string, number> = {
+      "HIGH": 1,
+      "MEDIUM": 2,
+      "LOW": 3
+    };
+
+    this.todo.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    this.inProgress.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    this.done.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+  }
+
 
   protected readonly Priority = Priority;
 }
