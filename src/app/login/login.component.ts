@@ -7,7 +7,6 @@ import {AuthService} from '../auth.service';
 import {MessageService} from 'primeng/api';
 import {MessageModule} from 'primeng/message';
 import {MessagesModule} from 'primeng/messages';
-import {Toast} from 'primeng/toast';
 import {NgClass} from '@angular/common';
 
 @Component({
@@ -21,7 +20,6 @@ import {NgClass} from '@angular/common';
     RouterLink,
     MessageModule,
     MessagesModule,
-    Toast,
     NgClass
   ],
   styleUrls: ['./login.component.css']
@@ -39,19 +37,6 @@ export class LoginComponent {
     private router: Router,
     private messageService: MessageService
   ) {
-    /*
-    const navigation = this.router.getCurrentNavigation();
-    console.log('Navigation:', navigation);
-    console.log('Message:', navigation?.extras?.state?.['message']);
-    if (navigation?.extras?.state?.['message']) {
-      console.log("ture message is da")
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Erfolgreich',
-        detail: navigation.extras.state['message'],
-      });
-    }
-    */
   }
 
 

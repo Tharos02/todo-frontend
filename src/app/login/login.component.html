@@ -30,9 +30,9 @@
           [(ngModel)]="credentials.password"
           required
           placeholder="Passwort eingeben"
-          class="w-83 p-3 border  rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
+          class="w-5/6 p-3 border  rounded-md focus:outline-none focus:ring-2 focus:border-transparent"
         />
-        <p-button class="ml-2 h-full" (click)="toggleShowPassword()"><i class="pi" [ngClass]="{
+        <p-button class="w-1/6 pl-2 h-full" (click)="toggleShowPassword()"><i class="pi" [ngClass]="{
               'pi-eye': showPassword,
               'pi-eye-slash': !showPassword
             }"></i></p-button>

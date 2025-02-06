@@ -6,7 +6,6 @@ import {Router, RouterLink} from '@angular/router';
 import {NgClass} from '@angular/common';
 import {AuthService} from '../auth.service';
 import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
 
 @Component({
   selector: 'app-register',
@@ -15,8 +14,7 @@ import {Toast} from 'primeng/toast';
     InputText,
     Button,
     RouterLink,
-    NgClass,
-    Toast
+    NgClass
   ],
   templateUrl: './register.component.html',
   standalone: true,
