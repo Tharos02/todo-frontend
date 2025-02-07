@@ -18,8 +18,8 @@
     </div>
   </p-dialog>
 </div>
-<div class="flex pl-7 pr-7 space-x-4" cdkDropListGroup>
-  <div class="w-1/3">
+<div class="flex pl-7 pr-7" cdkDropListGroup>
+  <div class="w-1/3 mr-4">
     <h2 class="text-xl font-bold">Todo</h2>
     <div cdkDropList id="todo" cdkDropListSortingDisabled [cdkDropListData]="todo" class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
       <div *ngFor="let task of todo" cdkDrag [cdkDragData]="task">
@@ -27,7 +27,7 @@
       </div>
     </div>
   </div>
-  <div class="w-1/3">
+  <div class="w-1/3 mr-4">
     <h2 class="text-xl font-bold">In Progress</h2>
     <div cdkDropList id="in_progress" cdkDropListSortingDisabled [cdkDropListData]="inProgress" class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
       <div *ngFor="let task of inProgress" cdkDrag [cdkDragData]="task">
