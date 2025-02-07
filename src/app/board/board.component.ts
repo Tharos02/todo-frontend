@@ -19,6 +19,8 @@ import {Textarea} from 'primeng/textarea';
 import {DialogService} from '../dialog.service';
 import {Priority} from '../enums/priority.enum';
 import {Status} from '../enums/status.enum';
+import {MessageService} from 'primeng/api';
+import {StatusPipe} from '../pipes/status.pipe';
 
 @Component({
   selector: 'app-board',
@@ -36,11 +38,16 @@ import {Status} from '../enums/status.enum';
     Select,
     FormsModule,
     Textarea,
+    StatusPipe,
   ],
   styleUrls: ['./board.component.css']
 })
 
 export class BoardComponent implements OnInit {
+
+  constructor(private taskService: TaskService, private dialogService: DialogService, private messageService: MessageService, private statusPipe: StatusPipe) {
+  }
+
   todo: Task[] = [];
   inProgress: Task[] = [];
   done: Task[] = [];
@@ -50,24 +57,38 @@ export class BoardComponent implements OnInit {
     {name: 'Medium', value: Priority.MEDIUM},
     {name: 'High', value: Priority.HIGH}
   ];
+  statusOptions: Object[] = [];
+
   newTask = {
     title: '',
     description: '',
     priority: Priority.LOW,
-    status: 'TODO'
+    status: Status.TODO
   };
 
+  visibleTaskDialog: boolean = false;
 
-  constructor(private taskService: TaskService, private dialogService: DialogService) {
-  }
+  editTask = {
+    title: '',
+    priority: Priority,
+    description: '',
+    status: Status.TODO
+  };
+
+  oldTask = {
+    title: '',
+    priority: Priority,
+    description: '',
+    status: Status.TODO
+  };
+  editMode: Boolean = false;
+
 
   drop(event: CdkDragDrop<any[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
-
-      this.sortTasks();
 
       let task: any = {
         id: event.item.data.id,
@@ -87,12 +108,18 @@ export class BoardComponent implements OnInit {
         case 'done':
           task.status = Status.DONE;
       }
-
       this.updateTask(task);
+      this.loadTasks();
     }
   }
 
   ngOnInit(): void {
+
+    this.statusOptions = [
+      {name: this.statusPipe.transform(Status.TODO), value: Status.TODO},
+      {name: this.statusPipe.transform(Status.IN_PROGRESS), value: Status.IN_PROGRESS},
+      {name: this.statusPipe.transform(Status.DONE), value: Status.DONE}
+    ]
 
     this.dialogService.dialogTrigger$.subscribe(() => {
       this.visible = true;
@@ -119,10 +146,9 @@ export class BoardComponent implements OnInit {
   }
 
 
-  updateTask(task: Task) {
+  updateTask(task: any) {
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
-        console.log(response);
       }, error: (error) => {
         console.error(error);
       }
@@ -141,17 +167,41 @@ export class BoardComponent implements OnInit {
   }
 
   sortTasks() {
-    const priorityOrder: Record<string, number> = {
-      "HIGH": 1,
-      "MEDIUM": 2,
-      "LOW": 3
-    };
-
-    this.todo.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-    this.inProgress.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-    this.done.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    this.todo.sort((a, b) => b.priority - a.priority);
+    this.inProgress.sort((a, b) => b.priority - a.priority);
+    this.done.sort((a, b) => b.priority - a.priority);
   }
 
+  openTask(task: any) {
+    this.visibleTaskDialog = true;
+    this.editTask = {...task};
+    this.oldTask = {...task};
+  }
 
-  protected readonly Priority = Priority;
+  abortEdit() {
+    this.editMode = false;
+    this.editTask = {...this.oldTask};
+  }
+
+  saveEditTask() {
+    this.taskService.updateTask(this.editTask).subscribe({
+      next: (response) => {
+        if (this.visibleTaskDialog) {
+          this.visibleTaskDialog = false;
+          this.editMode = false;
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Erfolgreich',
+            detail: 'Änderungen wurden erfolgreich übernommen!',
+          });
+          this.loadTasks();
+        }
+      }, error: (error) => {
+        console.error(error);
+      }
+    })
+  }
+
+  protected readonly Status = Status;
 }

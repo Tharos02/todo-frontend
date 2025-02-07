@@ -7,6 +7,7 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
 import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import {MessageService} from 'primeng/api';
+import {StatusPipe} from './pipes/status.pipe';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
+    StatusPipe,
     MessageService
   ]
 };

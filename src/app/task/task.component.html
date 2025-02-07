@@ -1,10 +1,10 @@
-<div class="bg-white p-2 my-2 rounded shadow">
-  @if (task.priority === 'LOW') {
-    <p class="text-right text-green-700 font-bold"> {{ task.priority }}</p>
-  } @else if (task.priority === 'MEDIUM') {
-    <p class="text-right text-orange-500 font-bold"> {{ task.priority }}</p>
-  } @else if (task.priority === 'HIGH'){
-    <p class="text-right text-red-700 font-bold"> {{ task.priority }}</p>
+<div class="bg-white p-2 my-2 rounded shadow" [draggable]="!visibleTaskDialog">
+  @if (task.priority === Priority.LOW) {
+    <p class="text-right text-green-700 font-bold">{{ task.priority | priorityLabel }}</p>
+  } @else if (task.priority === Priority.MEDIUM) {
+    <p class="text-right text-orange-500 font-bold">MEDIUM</p>
+  } @else if (task.priority === Priority.HIGH) {
+    <p class="text-right text-red-700 font-bold">HIGH</p>
   }
   <h3 class="font-bold">{{ task.title }}</h3>
   <p class="break-words">{{ task.description }}</p>

@@ -5,13 +5,14 @@ import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
 import {Injectable} from '@angular/core';
 import {Priority} from './enums/priority.enum';
+import {Status} from './enums/status.enum';
 
 export interface Task {
   id?: number,
   title: string,
   description: string,
   priority: Priority,
-  status: string,
+  status: Status,
   userId?: number,
 }
 
@@ -39,7 +40,7 @@ export class TaskService {
     })
   }
 
-  updateTask(task: Task): Observable<Task> {
+  updateTask(task: any): Observable<Task> {
     return this.http.patch<Task>(`${this.taskUrl}/update/${task.id}`, task, {
       withCredentials: true
     });

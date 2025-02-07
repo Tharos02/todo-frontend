@@ -1,45 +1,90 @@
 <div class="card flex justify-center p-4 md:p-0">
-  <p-dialog header="Neue Task erstellen" [modal]="true" [(visible)]="visible" [style]="{width: '90vw', maxWidth: '500px'}">
+  <p-dialog header="Neue Task erstellen" [draggable]="false" [modal]="true" [(visible)]="visible"
+            [style]="{width: '90vw', maxWidth: '500px'}">
     <div class="flex flex-col md:flex-row items-center gap-4 mb-4">
       <label for="priority" class="font-semibold w-full md:w-24">Priorität</label>
-      <p-select id="priority" optionValue="value" [options]="priorityOptions" [(ngModel)]="newTask.priority" optionLabel="name" class="flex-auto w-full md:w-auto" />
+      <p-select id="priority" optionValue="value" [options]="priorityOptions" [(ngModel)]="newTask.priority"
+                optionLabel="name" class="flex-auto w-full md:w-auto"/>
     </div>
     <div class="flex flex-col md:flex-row items-center gap-4 mb-4">
       <label for="title" class="font-semibold w-full md:w-24">Titel</label>
-      <input pInputText id="title" class="flex-auto w-full md:w-auto" autocomplete="off" [required]="true" [(ngModel)]="newTask.title" />
+      <input pInputText id="title" class="flex-auto w-full md:w-auto" autocomplete="off" [required]="true"
+             [(ngModel)]="newTask.title"/>
     </div>
     <div class="flex flex-col md:flex-row gap-4 mb-8">
       <label for="description" class="font-semibold w-full md:w-24">Beschreibung</label>
-      <textarea pTextarea rows="5" id="description" class="flex-auto w-full md:w-auto" autocomplete="off" [(ngModel)]="newTask.description"></textarea>
+      <textarea pTextarea rows="5" id="description" class="flex-auto w-full md:w-auto" autocomplete="off"
+                [(ngModel)]="newTask.description"></textarea>
     </div>
     <div class="flex justify-end gap-2">
-      <p-button label="Abbrechen" severity="secondary" (click)="visible = false" />
-      <p-button label="Erstellen" (click)="saveTask()" />
+      <p-button label="Abbrechen" severity="secondary" (click)="visible = false"/>
+      <p-button label="Erstellen" (click)="saveTask()"/>
     </div>
   </p-dialog>
+
+  <div class="card justify-center p-4 md:p-0">
+    <p-dialog [modal]="true" [draggable]="false" [(visible)]="visibleTaskDialog"
+              [style]="{width: '90vw', maxWidth: '500px'}">
+      <ng-template #header>
+        <p class="font-bold">{{ editTask.title }}</p>
+      </ng-template>
+      <div class="gap-4 mb-4">
+        <label class="font-semibold w-full md:w-24">Beschreibung</label>
+        @if (editMode) {
+          <textarea pTextarea [(ngModel)]="editTask.description" class="w-full md:w-auto"></textarea>
+        } @else {
+          <p class=" w-full md:w-auto">{{ editTask.description }}</p>
+        }
+      </div>
+      <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <label class="font-semibold w-full md:w-24">Priorität</label>
+        <p-select optionValue="value" [disabled]="!editMode" [options]="priorityOptions" [(ngModel)]="editTask.priority"
+                  optionLabel="name" class="flex-auto w-full md:w-auto"/>
+      </div>
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <label class="font-semibold w-full md:w-24">Status</label>
+        <p-select optionValue="value" [disabled]="!editMode" [options]="statusOptions" [(ngModel)]="editTask.status"
+                  optionLabel="name" class="flex-auto w-full md:w-auto"/>
+      </div>
+      @if (editMode) {
+        <div class="flex justify-end gap-2">
+          <p-button label="Abbrechen" severity="secondary" (click)="abortEdit()"/>
+          <p-button label="Speichern" (click)="saveEditTask()"/>
+        </div>
+      } @else {
+        <div class="flex justify-end gap-2">
+          <p-button label="Edit" severity="secondary" (click)="editMode = true"/>
+        </div>
+      }
+    </p-dialog>
+  </div>
+
 </div>
 <div class="flex pl-7 pr-7" cdkDropListGroup>
   <div class="w-1/3 mr-4">
     <h2 class="text-xl font-bold">Todo</h2>
-    <div cdkDropList id="todo" cdkDropListSortingDisabled [cdkDropListData]="todo" class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
+    <div cdkDropList id="todo" cdkDropListSortingDisabled [cdkDropListData]="todo"
+         class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
       <div *ngFor="let task of todo" cdkDrag [cdkDragData]="task">
-        <app-task [task]="task"></app-task>
+        <app-task [task]="task" (click)="openTask(task)"></app-task>
       </div>
     </div>
   </div>
   <div class="w-1/3 mr-4">
     <h2 class="text-xl font-bold">In Progress</h2>
-    <div cdkDropList id="in_progress" cdkDropListSortingDisabled [cdkDropListData]="inProgress" class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
+    <div cdkDropList id="in_progress" cdkDropListSortingDisabled [cdkDropListData]="inProgress"
+         class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
       <div *ngFor="let task of inProgress" cdkDrag [cdkDragData]="task">
-        <app-task [task]="task"></app-task>
+        <app-task [task]="task" (click)="openTask(task)"></app-task>
       </div>
     </div>
   </div>
   <div class="w-1/3">
     <h2 class="text-xl font-bold">Done</h2>
-    <div cdkDropList id="done" cdkDropListSortingDisabled [cdkDropListData]="done" class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
+    <div cdkDropList id="done" cdkDropListSortingDisabled [cdkDropListData]="done"
+         class="bg-gray-100 p-4 rounded min-h-15" (cdkDropListDropped)="drop($event)">
       <div *ngFor="let task of done" cdkDrag [cdkDragData]="task">
-        <app-task [task]="task"></app-task>
+        <app-task [task]="task" (click)="openTask(task)"></app-task>
       </div>
     </div>
   </div>
