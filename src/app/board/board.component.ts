@@ -109,7 +109,6 @@ export class BoardComponent implements OnInit {
           task.status = Status.DONE;
       }
       this.updateTask(task);
-      this.loadTasks();
     }
   }
 
@@ -149,6 +148,7 @@ export class BoardComponent implements OnInit {
   updateTask(task: any) {
     this.taskService.updateTask(task).subscribe({
       next: (response) => {
+        this.loadTasks();
       }, error: (error) => {
         console.error(error);
       }
